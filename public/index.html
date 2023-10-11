@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <form action="/apply-loan-success" method="POST" onsubmit="return validateForm()">
+    Name: <input type="text" name="name"><br>
+    Email: <input type="text" name="email"><br>
+    Phone: <input type="text" name="phone_number" id="phone_number"><br>
+    Loan Amount: <input type="text" name="loan_amount" id="loan_amount"><br>
+    Reason: <textarea name="reason"></textarea><br>
+    <label><input type="checkbox" name="agree">I agree to the terms and conditions</label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+</body>
+
+<script>
+  const loanAmount = document.getElementById('loan_amount');
+
+function validateForm() {
+  if (!loanAmount || loanAmount.value === '') {
+    alert('Loan Amount cannot be empty');
+    return false; // Prevent the form from being submitted
+  }
+  const loanAmountValue = parseFloat(loanAmount.value);
+  if (isNaN(loanAmountValue)) {
+    alert('Loan Amount must be a number');
+    return false; // Prevent the form from being submitted
+  }
+  return true;
+}
+</script>
+
+</html>
