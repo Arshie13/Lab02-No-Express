@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Loan Status</title>
 </head>
 <body>
-  <h1>Admin mode</h1>
+    <h1>Edit Loan Status</h1>
+    
+    <form action="/update-loan-status" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="new_status">New Loan Status:</label>
+        <select id="new_status" name="new_status" required>
+            <option value="APPLIED">APPLIED</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
+            <option value="CASH_RELEASED">CASH_RELEASED</option>
+            <option value="REPAID">REPAID</option>
+        </select>
+        
+        <button type="submit">Update Status</button>
+    </form>
 </body>
 </html>

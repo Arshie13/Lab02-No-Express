@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateHTML = exports.fetchFromDB = exports.insertFormData = void 0;
+exports.generateHTML = exports.fetchFromDB = exports.updateLoanStatus = exports.insertFormData = void 0;
 var pg_1 = require("pg");
 var crypto = require("node:crypto");
 var pool = new pg_1.Pool({
@@ -88,9 +88,36 @@ function insertFormData(formData) {
     });
 }
 exports.insertFormData = insertFormData;
+function updateLoanStatus(loan_name, new_status) {
+    return __awaiter(this, void 0, void 0, function () {
+        var query, values, client, result, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    query = "UPDATE loans SET loan_status = $2 WHERE name = $1 RETURNING *";
+                    values = [loan_name, new_status];
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 4, , 5]);
+                    return [4 /*yield*/, pool.connect()];
+                case 2:
+                    client = _a.sent();
+                    return [4 /*yield*/, client.query(query, values)];
+                case 3:
+                    result = _a.sent();
+                    return [3 /*break*/, 5];
+                case 4:
+                    error_2 = _a.sent();
+                    throw error_2;
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.updateLoanStatus = updateLoanStatus;
 function fetchFromDB(query) {
     return __awaiter(this, void 0, void 0, function () {
-        var client, result, error_2;
+        var client, result, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -103,8 +130,8 @@ function fetchFromDB(query) {
                     result = _a.sent();
                     return [2 /*return*/, result];
                 case 3:
-                    error_2 = _a.sent();
-                    throw error_2;
+                    error_3 = _a.sent();
+                    throw error_3;
                 case 4: return [2 /*return*/];
             }
         });
@@ -117,7 +144,7 @@ function generateHTML(data) {
         return __generator(this, function (_a) {
             html = "\n    <!DOCTYPE html>\n    <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\">\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n      <title>Data from Database</title>\n    </head>\n    <body>\n      <h1>Data from Database</h1>\n      <ul>\n  ";
             data.forEach(function (item) {
-                html += "\n        <li>Name: ".concat(item.name, "</li>\n        <li>Email: ").concat(item.email, "</li>\n        <li>Phone Number: ").concat(item.phone_number, "</li>\n        <li>Loan Amount: ").concat(item.loan_amount, "</li>\n        <li>Reason: ").concat(item.reason, "</li>\n    ");
+                html += "\n        <li>Name: ".concat(item.name, "</li>\n        <li>Email: ").concat(item.email, "</li>\n        <li>Phone Number: ").concat(item.phone_number, "</li>\n        <li>Loan Amount: ").concat(item.loan_amount, "</li>\n        <li>Reason: ").concat(item.reason, "</li> <br> <br>\n    ");
             });
             html += "\n      </ul>\n    </body>\n    </html>\n  ";
             return [2 /*return*/, html];

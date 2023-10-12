@@ -41,7 +41,7 @@ var fs = require("fs");
 var database_1 = require("./database");
 function handleRequest(request, response) {
     return __awaiter(this, void 0, void 0, function () {
-        var url, method, htmlFilePath, htmlErrorFilePath, adminHTMLPath, htmlContent, htmlErrorContent, result, data, html, error_1, htmlErrorContent, result, data, adminHTMLContent, error_2, htmlErrorContent, body;
+        var url, method, htmlFilePath, htmlErrorFilePath, adminHTMLPath, htmlContent, htmlErrorContent, body_1, result, data, html, error_1, htmlErrorContent, adminHtml, htmlErrorContent, body_2;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -64,66 +64,19 @@ function handleRequest(request, response) {
                         response.writeHead(500, { 'Content-Type': 'text/html' });
                         response.end(htmlErrorContent);
                     }
-                    return [3 /*break*/, 13];
+                    return [3 /*break*/, 8];
                 case 1:
                     if (!(url === '/apply-loan-success' && method === 'POST')) return [3 /*break*/, 7];
-                    _a.label = 2;
-                case 2:
-                    _a.trys.push([2, 5, , 6]);
-                    return [4 /*yield*/, (0, database_1.fetchFromDB)('SELECT * FROM loans')];
-                case 3:
-                    result = _a.sent();
-                    data = result.rows;
-                    return [4 /*yield*/, (0, database_1.generateHTML)(data)];
-                case 4:
-                    html = _a.sent();
-                    response.writeHead(200, { 'Content-Type': 'text/html' });
-                    response.end(html);
-                    return [3 /*break*/, 6];
-                case 5:
-                    error_1 = _a.sent();
-                    htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
-                    console.error('failed to fetch data from database');
-                    response.writeHead(500, { 'Content-Type': 'text/plain' });
-                    response.end(htmlErrorContent);
-                    return [3 /*break*/, 6];
-                case 6: return [3 /*break*/, 13];
-                case 7:
-                    if (!(url === '/admin')) return [3 /*break*/, 12];
-                    _a.label = 8;
-                case 8:
-                    _a.trys.push([8, 10, , 11]);
-                    return [4 /*yield*/, (0, database_1.fetchFromDB)('SELECT * FROM loans')];
-                case 9:
-                    result = _a.sent();
-                    data = result.rows;
-                    adminHTMLContent = fs.readFileSync(adminHTMLPath, 'utf-8');
-                    response.writeHead(200, { 'Content-Type': 'text/html' });
-                    response.end(adminHTMLContent);
-                    return [3 /*break*/, 11];
-                case 10:
-                    error_2 = _a.sent();
-                    htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
-                    console.error('failed to fetch data from database');
-                    response.writeHead(500, { 'Content-Type': 'text/plain' });
-                    response.end(htmlErrorContent);
-                    return [3 /*break*/, 11];
-                case 11: return [3 /*break*/, 13];
-                case 12:
-                    response.writeHead(404, { 'Content-Type': 'text/plain' });
-                    response.end(url);
-                    _a.label = 13;
-                case 13:
-                    body = '';
+                    body_1 = '';
                     request.on('data', function (chunk) {
-                        body += chunk.toString();
+                        body_1 += chunk.toString();
                     });
                     request.on('end', function () { return __awaiter(_this, void 0, void 0, function () {
-                        var formData, name, email, phone_number, loanAmount, loanAmountInt, reason, approval_or_rejection, result, error_3;
+                        var formData, name, email, phone_number, loanAmount, loanAmountInt, reason, approval_or_rejection, error_2;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    formData = new URLSearchParams(body);
+                                    formData = new URLSearchParams(body_1);
                                     name = formData.get('name') || '';
                                     email = formData.get('email') || '';
                                     phone_number = formData.get('phone_number') || '';
@@ -144,24 +97,94 @@ function handleRequest(request, response) {
                                             approval_or_rejection: approval_or_rejection
                                         })];
                                 case 2:
-                                    result = _a.sent();
-                                    if (result) {
-                                        console.log('Data inserted successfully.');
-                                    }
-                                    else {
-                                        console.log('Data insertion failed.');
-                                    }
+                                    _a.sent();
+                                    console.log('Data inserted successfully.');
                                     return [3 /*break*/, 4];
                                 case 3:
-                                    error_3 = _a.sent();
-                                    console.error('Error inserting data:', error_3);
+                                    error_2 = _a.sent();
+                                    console.error('Error inserting data:', error_2);
                                     console.log('Data insertion failed.');
                                     return [3 /*break*/, 4];
                                 case 4: return [2 /*return*/];
                             }
                         });
                     }); });
-                    return [2 /*return*/];
+                    _a.label = 2;
+                case 2:
+                    _a.trys.push([2, 5, , 6]);
+                    return [4 /*yield*/, (0, database_1.fetchFromDB)('SELECT * FROM loans')];
+                case 3:
+                    result = _a.sent();
+                    data = result.rows;
+                    return [4 /*yield*/, (0, database_1.generateHTML)(data)];
+                case 4:
+                    html = _a.sent();
+                    response.writeHead(200, { 'Content-Type': 'text/html' });
+                    response.end(html);
+                    return [3 /*break*/, 6];
+                case 5:
+                    error_1 = _a.sent();
+                    htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
+                    console.error('failed to fetch data from database');
+                    response.writeHead(500, { 'Content-Type': 'text/plain' });
+                    response.end(htmlErrorContent);
+                    return [3 /*break*/, 6];
+                case 6: return [3 /*break*/, 8];
+                case 7:
+                    if (url === '/admin') {
+                        console.log(url, method);
+                        try {
+                            adminHtml = fs.readFileSync(adminHTMLPath, 'utf-8');
+                            response.writeHead(200, { 'Content-Type': 'text/html' });
+                            response.end(adminHtml);
+                        }
+                        catch (error) {
+                            htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
+                            console.error('Failed to load admin.html');
+                            response.writeHead(500, { 'Content-Type': 'text/plain' });
+                            response.end(htmlErrorContent);
+                        }
+                    }
+                    else if (url === '/update-loan-status' && method === "POST") {
+                        body_2 = '';
+                        request.on('data', function (chunk) {
+                            body_2 += chunk.toString();
+                        });
+                        request.on('end', function () { return __awaiter(_this, void 0, void 0, function () {
+                            var formData, loanName, updateStatus, result, error_3, htmlErrorContent;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        formData = new URLSearchParams(body_2);
+                                        loanName = formData.get('name') || '';
+                                        updateStatus = formData.get('new_status') || '';
+                                        _a.label = 1;
+                                    case 1:
+                                        _a.trys.push([1, 3, , 4]);
+                                        return [4 /*yield*/, (0, database_1.updateLoanStatus)(loanName, updateStatus)];
+                                    case 2:
+                                        result = _a.sent();
+                                        response.writeHead(500, { 'Content-Type': 'text/html' });
+                                        response.end('loan status updated successsfully');
+                                        return [3 /*break*/, 4];
+                                    case 3:
+                                        error_3 = _a.sent();
+                                        htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
+                                        console.error('failed to update loan status');
+                                        response.writeHead(500, { 'Content-Type': 'text/plain' });
+                                        response.end(htmlErrorContent);
+                                        return [3 /*break*/, 4];
+                                    case 4: return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                    }
+                    else {
+                        response.writeHead(404, { 'Content-Type': 'text/plain' });
+                        response.end(url);
+                    }
+                    _a.label = 8;
+                case 8: return [2 /*return*/];
             }
         });
     });

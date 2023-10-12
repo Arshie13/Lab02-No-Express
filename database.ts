@@ -51,6 +51,17 @@ export async function insertFormData(formData: {
   }
 }
 
+export async function updateLoanStatus(loan_name: string, new_status: string) {
+  const query = `UPDATE loans SET loan_status = $2 WHERE name = $1 RETURNING *`;
+  const values = [loan_name, new_status];
+  try {
+    const client = await pool.connect();
+    const result = await client.query(query, values)
+  } catch (error) {
+    throw error
+  }
+}
+
 export async function fetchFromDB(query: string): Promise<QueryResult> {
   try {
     const client = await pool.connect();
@@ -81,7 +92,7 @@ export async function generateHTML(data: any[]): Promise<string> {
         <li>Email: ${item.email}</li>
         <li>Phone Number: ${item.phone_number}</li>
         <li>Loan Amount: ${item.loan_amount}</li>
-        <li>Reason: ${item.reason}</li>
+        <li>Reason: ${item.reason}</li> <br> <br>
     `;
   });
 
