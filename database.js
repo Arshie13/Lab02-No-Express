@@ -36,9 +36,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateHTML = exports.fetchFromDB = exports.updateLoanStatus = exports.insertFormData = void 0;
+exports.fetchFromDB = exports.updateLoanStatus = exports.insertFormData = void 0;
 var pg_1 = require("pg");
-var crypto = require("node:crypto");
+var generator_1 = require("./generator");
 var pool = new pg_1.Pool({
     user: 'postgres',
     host: 'localhost',
@@ -46,16 +46,13 @@ var pool = new pg_1.Pool({
     password: "postgres",
     port: 5432
 });
-function generateToken() {
-    return crypto.randomBytes(32).toString('base64url');
-}
 function insertFormData(formData) {
     return __awaiter(this, void 0, void 0, function () {
         var token, query, values, client, result, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    token = generateToken();
+                    token = (0, generator_1.generateToken)();
                     query = "\n    INSERT INTO loans (name, email, phone_number, loan_amount, reason, approval_or_rejection, token)\n    VALUES ($1, $2, $3, $4, $5, $6, $7)\n    RETURNING *;\n  ";
                     values = [
                         formData.name,
@@ -75,8 +72,7 @@ function insertFormData(formData) {
                     return [4 /*yield*/, client.query(query, values)];
                 case 3:
                     result = _a.sent();
-                    console.log('Data inserted with token: ', token, 'and date: ', result.rows[0].approval_or_rejection);
-                    console.log('sent');
+                    console.log('Data inserted to db');
                     return [2 /*return*/, result];
                 case 4:
                     error_1 = _a.sent();
@@ -90,7 +86,7 @@ function insertFormData(formData) {
 exports.insertFormData = insertFormData;
 function updateLoanStatus(token, new_status) {
     return __awaiter(this, void 0, void 0, function () {
-        var query, values, client, error_2;
+        var query, values, client, checkToken, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -98,19 +94,24 @@ function updateLoanStatus(token, new_status) {
                     values = [token, new_status];
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 4, , 5]);
+                    _a.trys.push([1, 6, , 7]);
                     return [4 /*yield*/, pool.connect()];
                 case 2:
                     client = _a.sent();
-                    return [4 /*yield*/, client.query(query, values)];
+                    return [4 /*yield*/, (0, generator_1.checkIfTokenExists)(client, token)];
                 case 3:
-                    _a.sent();
-                    return [3 /*break*/, 5];
+                    checkToken = _a.sent();
+                    if (!checkToken) return [3 /*break*/, 5];
+                    return [4 /*yield*/, client.query(query, values)];
                 case 4:
+                    _a.sent();
+                    _a.label = 5;
+                case 5: return [3 /*break*/, 7];
+                case 6:
                     error_2 = _a.sent();
                     console.error(error_2);
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     });
@@ -139,17 +140,3 @@ function fetchFromDB(query) {
     });
 }
 exports.fetchFromDB = fetchFromDB;
-function generateHTML(data) {
-    return __awaiter(this, void 0, void 0, function () {
-        var html;
-        return __generator(this, function (_a) {
-            html = "\n    <!DOCTYPE html>\n    <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\">\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n      <title>Data from Database</title>\n    </head>\n    <body>\n      <h1>Data from Database</h1>\n      <ul>\n  ";
-            data.forEach(function (item) {
-                html += "\n        <li>Name: ".concat(item.name, "</li>\n        <li>Email: ").concat(item.email, "</li>\n        <li>Phone Number: ").concat(item.phone_number, "</li>\n        <li>Loan Amount: ").concat(item.loan_amount, "</li>\n        <li>Reason: ").concat(item.reason, "</li>\n        <li>Loan Status: ").concat(item.loan_status, "</li>\n        <li>Token: ").concat(item.token, " <======= Please copy this as this is needed for loan validation. \n        Please don't share token to anyone.\n        </li>\n        <br> <br>\n    ");
-            });
-            html += "\n      </ul>\n    </body>\n    </html>\n  ";
-            return [2 /*return*/, html];
-        });
-    });
-}
-exports.generateHTML = generateHTML;

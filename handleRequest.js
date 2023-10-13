@@ -39,9 +39,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleRequest = void 0;
 var fs = require("fs");
 var database_1 = require("./database");
+var generator_1 = require("./generator");
 function handleRequest(request, response) {
     return __awaiter(this, void 0, void 0, function () {
-        var url, method, htmlFilePath, htmlErrorFilePath, adminHTMLPath, checkLoanStatusPath, htmlContent, htmlErrorContent, body_1, result, data, html, error_1, adminHtml, htmlErrorContent, body_2, checkStatusHTML, htmlErrorContent, body_3;
+        var url, method, htmlFilePath, htmlErrorFilePath, adminHTMLPath, checkLoanStatusPath, htmlContent, htmlErrorContent, body_1, result, data, html, error_1, htmlErrorContent, adminHtml, htmlErrorContent, body_2, checkStatusHTML, htmlErrorContent, body_3;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -56,14 +57,16 @@ function handleRequest(request, response) {
                     if (!(url === '/apply-loan')) return [3 /*break*/, 1];
                     try {
                         htmlContent = fs.readFileSync(htmlFilePath, 'utf-8');
-                        response.writeHead(200, { 'Content-Type': 'text/html' });
-                        response.end(htmlContent);
+                        response
+                            .writeHead(200, { 'Content-Type': 'text/html' })
+                            .end(htmlContent);
                     }
                     catch (err) {
                         htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
                         console.error('some kinda error but in console');
-                        response.writeHead(500, { 'Content-Type': 'text/html' });
-                        response.end(htmlErrorContent);
+                        response
+                            .writeHead(500, { 'Content-Type': 'text/html' })
+                            .end(htmlErrorContent);
                     }
                     return [3 /*break*/, 9];
                 case 1:
@@ -100,14 +103,17 @@ function handleRequest(request, response) {
                                 case 2:
                                     _a.sent();
                                     console.log('Data inserted successfully.');
-                                    response.writeHead(302, { 'Location': '/success-page' }).end();
+                                    response
+                                        .writeHead(302, { 'Location': '/success-page' })
+                                        .end();
                                     return [3 /*break*/, 4];
                                 case 3:
                                     error_2 = _a.sent();
                                     htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
-                                    console.error('failed to fetch data from database');
-                                    response.writeHead(500, { 'Content-Type': 'text/plain' });
-                                    response.end(htmlErrorContent);
+                                    console.error('failed to insert data from database');
+                                    response
+                                        .writeHead(500, { 'Content-Type': 'text/plain' })
+                                        .end(htmlErrorContent);
                                     return [3 /*break*/, 4];
                                 case 4: return [2 /*return*/];
                             }
@@ -123,29 +129,37 @@ function handleRequest(request, response) {
                 case 4:
                     result = _a.sent();
                     data = result.rows;
-                    return [4 /*yield*/, (0, database_1.generateHTML)(data)];
+                    return [4 /*yield*/, (0, generator_1.generateHTML)(data)];
                 case 5:
                     html = _a.sent();
-                    response.writeHead(200, { 'Content-Type': 'text/html' });
-                    response.end(html);
+                    response
+                        .writeHead(200, { 'Content-Type': 'text/html' })
+                        .end(html);
                     return [3 /*break*/, 7];
                 case 6:
                     error_1 = _a.sent();
-                    throw error_1;
+                    htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
+                    console.error('failed to fetch data from database');
+                    response
+                        .writeHead(500, { 'Content-Type': 'text/plain' })
+                        .end(htmlErrorContent);
+                    return [3 /*break*/, 7];
                 case 7: return [3 /*break*/, 9];
                 case 8:
                     if (url === '/admin' && method === 'POST') {
                         console.log(url, method);
                         try {
                             adminHtml = fs.readFileSync(adminHTMLPath, 'utf-8');
-                            response.writeHead(200, { 'Content-Type': 'text/html' });
-                            response.end(adminHtml);
+                            response
+                                .writeHead(200, { 'Content-Type': 'text/html' })
+                                .end(adminHtml);
                         }
                         catch (error) {
                             htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
                             console.error(error);
-                            response.writeHead(500, { 'Content-Type': 'text/plain' });
-                            response.end(htmlErrorContent);
+                            response
+                                .writeHead(500, { 'Content-Type': 'text/plain' })
+                                .end(htmlErrorContent);
                         }
                     }
                     else if (url === '/update-loan-status' && method === "POST") {
@@ -171,18 +185,20 @@ function handleRequest(request, response) {
                                     case 3:
                                         result = _a.sent();
                                         data = result.rows;
-                                        return [4 /*yield*/, (0, database_1.generateHTML)(data)];
+                                        return [4 /*yield*/, (0, generator_1.generateHTML)(data)];
                                     case 4:
                                         html = _a.sent();
-                                        response.writeHead(200, { 'Content-Type': 'text/html' });
-                                        response.end(html);
+                                        response
+                                            .writeHead(200, { 'Content-Type': 'text/html' })
+                                            .end(html);
                                         return [3 /*break*/, 6];
                                     case 5:
                                         error_3 = _a.sent();
                                         console.error(error_3);
                                         htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
-                                        response.writeHead(500, { 'Content-Type': 'text/html' });
-                                        response.end(htmlErrorContent);
+                                        response
+                                            .writeHead(500, { 'Content-Type': 'text/html' })
+                                            .end(htmlErrorContent);
                                         return [3 /*break*/, 6];
                                     case 6: return [2 /*return*/];
                                 }
@@ -192,14 +208,16 @@ function handleRequest(request, response) {
                     else if (url === '/check-loan-status' && method === 'POST') {
                         try {
                             checkStatusHTML = fs.readFileSync(checkLoanStatusPath, 'utf-8');
-                            response.writeHead(200, { 'Content-Type': 'text/html' });
-                            response.end(checkStatusHTML);
+                            response
+                                .writeHead(200, { 'Content-Type': 'text/html' })
+                                .end(checkStatusHTML);
                         }
                         catch (error) {
                             console.error(error);
                             htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
-                            response.writeHead(500, { 'Content-Type': 'text/html' });
-                            response.end(htmlErrorContent);
+                            response
+                                .writeHead(500, { 'Content-Type': 'text/html' })
+                                .end(htmlErrorContent);
                         }
                     }
                     else if (url === '/display-loan-status' && method === 'POST') {
@@ -222,18 +240,20 @@ function handleRequest(request, response) {
                                     case 2:
                                         result = _a.sent();
                                         data = result.rows;
-                                        return [4 /*yield*/, (0, database_1.generateHTML)(data)];
+                                        return [4 /*yield*/, (0, generator_1.generateHTML)(data)];
                                     case 3:
                                         html = _a.sent();
-                                        response.writeHead(200, { 'Content-Type': 'text/html' });
-                                        response.end(html);
+                                        response
+                                            .writeHead(200, { 'Content-Type': 'text/html' })
+                                            .end(html);
                                         return [3 /*break*/, 5];
                                     case 4:
                                         error_4 = _a.sent();
                                         console.error(error_4);
                                         htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
-                                        response.writeHead(500, { 'Content-Type': 'text/html' });
-                                        response.end(htmlErrorContent);
+                                        response
+                                            .writeHead(500, { 'Content-Type': 'text/html' })
+                                            .end(htmlErrorContent);
                                         return [3 /*break*/, 5];
                                     case 5: return [2 /*return*/];
                                 }
@@ -241,8 +261,9 @@ function handleRequest(request, response) {
                         }); });
                     }
                     else {
-                        response.writeHead(404, { 'Content-Type': 'text/plain' });
-                        response.end(url);
+                        response
+                            .writeHead(404, { 'Content-Type': 'text/plain' })
+                            .end(url);
                     }
                     _a.label = 9;
                 case 9: return [2 /*return*/];

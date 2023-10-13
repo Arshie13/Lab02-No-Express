@@ -1,27 +1,31 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import * as fs from 'fs';
-import { fetchFromDB, generateHTML, insertFormData, updateLoanStatus } from './database';
+import { fetchFromDB, insertFormData, updateLoanStatus } from './database';
+import { generateHTML } from './generator';
 
 export async function handleRequest(request: IncomingMessage, response: ServerResponse) {
   const url = request.url;
   const method = request.method;
   const htmlFilePath = './public/index.html';
   const htmlErrorFilePath = './public/error.html';
-  const adminHTMLPath = './public/admin.html'
-  const checkLoanStatusPath = './public/checkLoanStatus.html'
+  const adminHTMLPath = './public/admin.html';
+  const checkLoanStatusPath = './public/checkLoanStatus.html';
 
   console.log('Debugging -- url is', url, 'while method is', method);
 
   if (url === '/apply-loan') {
+
     try {
       const htmlContent = fs.readFileSync(htmlFilePath, 'utf-8');
-      response.writeHead(200, { 'Content-Type': 'text/html' });
-      response.end(htmlContent);
+      response
+        .writeHead(200, { 'Content-Type': 'text/html' })
+        .end(htmlContent);
     } catch (err) {
       const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
       console.error('some kinda error but in console')
-      response.writeHead(500, { 'Content-Type': 'text/html' });
-      response.end(htmlErrorContent);
+      response
+        .writeHead(500, { 'Content-Type': 'text/html' })
+        .end(htmlErrorContent);
     }
   } else if (url === '/apply-loan-success' && method === 'POST') {
 
@@ -41,6 +45,7 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
       const approval_or_rejection = new Date(Date.now()) // convert from number to Date object
 
       try {
+
         await insertFormData({
           name: name,
           email: email,
@@ -49,13 +54,18 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
           reason: reason,
           approval_or_rejection: approval_or_rejection
         });
+
         console.log('Data inserted successfully.');
-        response.writeHead(302, { 'Location': '/success-page' }).end();
+        response
+          .writeHead(302, { 'Location': '/success-page' })
+          .end();
+
       } catch (error) {
         const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
-        console.error('failed to fetch data from database');
-        response.writeHead(500, { 'Content-Type': 'text/plain' });
-        response.end(htmlErrorContent);
+        console.error('failed to insert data from database');
+        response
+          .writeHead(500, { 'Content-Type': 'text/plain' })
+          .end(htmlErrorContent);
       }
     });
   } else if (url === '/success-page' && method === 'GET') {
@@ -64,23 +74,30 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
       const result = await fetchFromDB('SELECT * FROM loans ORDER BY loan_id DESC LIMIT 1');
       const data = result.rows;
       const html = await generateHTML(data);
-      response.writeHead(200, { 'Content-Type': 'text/html' });
-      response.end(html);
+      response
+        .writeHead(200, { 'Content-Type': 'text/html' })
+        .end(html);
     } catch (error) {
-      throw error;
+      const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
+      console.error('failed to fetch data from database');
+      response
+        .writeHead(500, { 'Content-Type': 'text/plain' })
+        .end(htmlErrorContent);
     }
 
   } else if (url === '/admin' && method === 'POST') {
     console.log(url, method)
     try {
       const adminHtml = fs.readFileSync(adminHTMLPath, 'utf-8');
-      response.writeHead(200, { 'Content-Type': 'text/html' });
-      response.end(adminHtml);
+      response
+        .writeHead(200, { 'Content-Type': 'text/html' })
+        .end(adminHtml);
     } catch (error) {
       const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
       console.error(error);
-      response.writeHead(500, { 'Content-Type': 'text/plain' });
-      response.end(htmlErrorContent);
+      response
+        .writeHead(500, { 'Content-Type': 'text/plain' })
+        .end(htmlErrorContent);
     }
 
   } else if (url === '/update-loan-status' && method === "POST") {
@@ -98,13 +115,15 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
         const result = await fetchFromDB('SELECT * FROM loans');
         const data = result.rows;
         const html = await generateHTML(data);
-        response.writeHead(200, { 'Content-Type': 'text/html' });
-        response.end(html);
+        response
+          .writeHead(200, { 'Content-Type': 'text/html' })
+          .end(html);
       } catch (error) {
         console.error(error)
         const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
-        response.writeHead(500, { 'Content-Type': 'text/html' });
-        response.end(htmlErrorContent);
+        response
+          .writeHead(500, { 'Content-Type': 'text/html' })
+          .end(htmlErrorContent);
       }
     })
 
@@ -112,13 +131,15 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
 
     try {
       const checkStatusHTML = fs.readFileSync(checkLoanStatusPath, 'utf-8')
-      response.writeHead(200, { 'Content-Type': 'text/html' })
-      response.end(checkStatusHTML)
+      response
+        .writeHead(200, { 'Content-Type': 'text/html' })
+        .end(checkStatusHTML)
     } catch (error) {
       console.error(error)
       const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
-      response.writeHead(500, { 'Content-Type': 'text/html' });
-      response.end(htmlErrorContent);
+      response
+        .writeHead(500, { 'Content-Type': 'text/html' })
+        .end(htmlErrorContent);
     }
 
   } else if (url === '/display-loan-status' && method === 'POST') {
@@ -136,18 +157,21 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
         const result = await fetchFromDB(query);
         const data = result.rows;
         const html = await generateHTML(data);
-        response.writeHead(200, { 'Content-Type': 'text/html' });
-        response.end(html);
+        response
+          .writeHead(200, { 'Content-Type': 'text/html' })
+          .end(html);
       } catch (error) {
         console.error(error)
         const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
-        response.writeHead(500, { 'Content-Type': 'text/html' });
-        response.end(htmlErrorContent);
+        response
+          .writeHead(500, { 'Content-Type': 'text/html' })
+          .end(htmlErrorContent);
       }
     })
 
   } else {
-    response.writeHead(404, { 'Content-Type': 'text/plain' });
-    response.end(url);
+    response
+      .writeHead(404, { 'Content-Type': 'text/plain' })
+      .end(url);
   }
 }
