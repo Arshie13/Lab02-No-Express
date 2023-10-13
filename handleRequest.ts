@@ -8,6 +8,7 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
   const htmlFilePath = './public/index.html';
   const htmlErrorFilePath = './public/error.html';
   const adminHTMLPath = './public/admin.html'
+  const checkLoanStatusPath = './public/checkLoanStatus.html'
 
   console.log('Debugging -- url is', url, 'while method is', method);
 
@@ -49,26 +50,27 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
           approval_or_rejection: approval_or_rejection
         });
         console.log('Data inserted successfully.');
+        response.writeHead(302, { 'Location': '/success-page' }).end();
       } catch (error) {
-        console.error('Error inserting data:', error);
-        console.log('Data insertion failed.');
+        const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
+        console.error('failed to fetch data from database');
+        response.writeHead(500, { 'Content-Type': 'text/plain' });
+        response.end(htmlErrorContent);
       }
     });
+  } else if (url === '/success-page' && method === 'GET') {
 
     try {
-      const result = await fetchFromDB('SELECT * FROM loans');
+      const result = await fetchFromDB('SELECT * FROM loans ORDER BY loan_id DESC LIMIT 1');
       const data = result.rows;
       const html = await generateHTML(data);
-
       response.writeHead(200, { 'Content-Type': 'text/html' });
       response.end(html);
     } catch (error) {
-      const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
-      console.error('failed to fetch data from database')
-      response.writeHead(500, { 'Content-Type': 'text/plain' });
-      response.end(htmlErrorContent);
+      throw error;
     }
-  } else if (url === '/admin') {
+
+  } else if (url === '/admin' && method === 'POST') {
     console.log(url, method)
     try {
       const adminHtml = fs.readFileSync(adminHTMLPath, 'utf-8');
@@ -76,12 +78,50 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
       response.end(adminHtml);
     } catch (error) {
       const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8');
-      console.error('Failed to load admin.html');
+      console.error(error);
       response.writeHead(500, { 'Content-Type': 'text/plain' });
       response.end(htmlErrorContent);
     }
 
   } else if (url === '/update-loan-status' && method === "POST") {
+    let body = '';
+    request.on('data', (chunk) => {
+      body += chunk.toString();
+    });
+    request.on('end', async () => {
+      const formData = new URLSearchParams(body)
+      const token = formData.get('token') || ''
+      const updateStatus = formData.get('new_status') || ''
+
+      try {
+        await updateLoanStatus(token, updateStatus);
+        const result = await fetchFromDB('SELECT * FROM loans');
+        const data = result.rows;
+        const html = await generateHTML(data);
+        response.writeHead(200, { 'Content-Type': 'text/html' });
+        response.end(html);
+      } catch (error) {
+        console.error(error)
+        const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
+        response.writeHead(500, { 'Content-Type': 'text/html' });
+        response.end(htmlErrorContent);
+      }
+    })
+
+  } else if (url === '/check-loan-status' && method === 'POST') {
+
+    try {
+      const checkStatusHTML = fs.readFileSync(checkLoanStatusPath, 'utf-8')
+      response.writeHead(200, { 'Content-Type': 'text/html' })
+      response.end(checkStatusHTML)
+    } catch (error) {
+      console.error(error)
+      const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
+      response.writeHead(500, { 'Content-Type': 'text/html' });
+      response.end(htmlErrorContent);
+    }
+
+  } else if (url === '/display-loan-status' && method === 'POST') {
 
     let body = '';
     request.on('data', (chunk) => {
@@ -89,21 +129,21 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
     });
     request.on('end', async () => {
       const formData = new URLSearchParams(body)
-      const loanName = formData.get('name') || ''
-      const updateStatus = formData.get('new_status') || ''
+      const token = formData.get('token') || ''
 
       try {
-        const result = await updateLoanStatus(loanName, updateStatus)
-        response.writeHead(500, { 'Content-Type': 'text/html' });
-        response.end('loan status updated successsfully');
-
+        const query = `SELECT * FROM loans WHERE token = '${token}'`
+        const result = await fetchFromDB(query);
+        const data = result.rows;
+        const html = await generateHTML(data);
+        response.writeHead(200, { 'Content-Type': 'text/html' });
+        response.end(html);
       } catch (error) {
+        console.error(error)
         const htmlErrorContent = fs.readFileSync(htmlErrorFilePath, 'utf-8')
-        console.error('failed to update loan status')
-        response.writeHead(500, { 'Content-Type': 'text/plain' });
+        response.writeHead(500, { 'Content-Type': 'text/html' });
         response.end(htmlErrorContent);
       }
-
     })
 
   } else {

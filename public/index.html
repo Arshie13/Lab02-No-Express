@@ -9,8 +9,12 @@
 
 <body>
 
-  <form action="/admin" method="GET">
+  <form action="/admin" method="POST">
     <button type="submit">Admin mode</button>
+  </form> 
+  <br>
+  <form action="/check-loan-status" method="POST">
+    <button type="submit">Check Loan Status</button>
   </form>
 
   <form action="/apply-loan-success" method="POST" onsubmit="return validateForm()">

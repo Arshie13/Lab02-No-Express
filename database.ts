@@ -51,14 +51,14 @@ export async function insertFormData(formData: {
   }
 }
 
-export async function updateLoanStatus(loan_name: string, new_status: string) {
-  const query = `UPDATE loans SET loan_status = $2 WHERE name = $1 RETURNING *`;
-  const values = [loan_name, new_status];
+export async function updateLoanStatus(token: string, new_status: string) {
+  const query = `UPDATE loans SET loan_status = $2 WHERE token = $1 RETURNING *`;
+  const values = [token, new_status];
   try {
     const client = await pool.connect();
-    const result = await client.query(query, values)
+    await client.query(query, values)
   } catch (error) {
-    throw error
+    console.error(error)
   }
 }
 
@@ -92,7 +92,12 @@ export async function generateHTML(data: any[]): Promise<string> {
         <li>Email: ${item.email}</li>
         <li>Phone Number: ${item.phone_number}</li>
         <li>Loan Amount: ${item.loan_amount}</li>
-        <li>Reason: ${item.reason}</li> <br> <br>
+        <li>Reason: ${item.reason}</li>
+        <li>Loan Status: ${item.loan_status}</li>
+        <li>Token: ${item.token} <======= Please copy this as this is needed for loan validation. 
+        Please don't share token to anyone.
+        </li>
+        <br> <br>
     `;
   });
 

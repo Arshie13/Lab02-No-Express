@@ -88,14 +88,14 @@ function insertFormData(formData) {
     });
 }
 exports.insertFormData = insertFormData;
-function updateLoanStatus(loan_name, new_status) {
+function updateLoanStatus(token, new_status) {
     return __awaiter(this, void 0, void 0, function () {
-        var query, values, client, result, error_2;
+        var query, values, client, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    query = "UPDATE loans SET loan_status = $2 WHERE name = $1 RETURNING *";
-                    values = [loan_name, new_status];
+                    query = "UPDATE loans SET loan_status = $2 WHERE token = $1 RETURNING *";
+                    values = [token, new_status];
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 4, , 5]);
@@ -104,11 +104,12 @@ function updateLoanStatus(loan_name, new_status) {
                     client = _a.sent();
                     return [4 /*yield*/, client.query(query, values)];
                 case 3:
-                    result = _a.sent();
+                    _a.sent();
                     return [3 /*break*/, 5];
                 case 4:
                     error_2 = _a.sent();
-                    throw error_2;
+                    console.error(error_2);
+                    return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];
             }
         });
@@ -144,7 +145,7 @@ function generateHTML(data) {
         return __generator(this, function (_a) {
             html = "\n    <!DOCTYPE html>\n    <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\">\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n      <title>Data from Database</title>\n    </head>\n    <body>\n      <h1>Data from Database</h1>\n      <ul>\n  ";
             data.forEach(function (item) {
-                html += "\n        <li>Name: ".concat(item.name, "</li>\n        <li>Email: ").concat(item.email, "</li>\n        <li>Phone Number: ").concat(item.phone_number, "</li>\n        <li>Loan Amount: ").concat(item.loan_amount, "</li>\n        <li>Reason: ").concat(item.reason, "</li> <br> <br>\n    ");
+                html += "\n        <li>Name: ".concat(item.name, "</li>\n        <li>Email: ").concat(item.email, "</li>\n        <li>Phone Number: ").concat(item.phone_number, "</li>\n        <li>Loan Amount: ").concat(item.loan_amount, "</li>\n        <li>Reason: ").concat(item.reason, "</li>\n        <li>Loan Status: ").concat(item.loan_status, "</li>\n        <li>Token: ").concat(item.token, " <======= Please copy this as this is needed for loan validation. \n        Please don't share token to anyone.\n        </li>\n        <br> <br>\n    ");
             });
             html += "\n      </ul>\n    </body>\n    </html>\n  ";
             return [2 /*return*/, html];
