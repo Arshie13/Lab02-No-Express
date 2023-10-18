@@ -243,9 +243,8 @@ function handleRequest(request, response) {
                                         return [4 /*yield*/, (0, generator_1.generateHTML)(data)];
                                     case 3:
                                         html = _a.sent();
-                                        response
-                                            .writeHead(200, { 'Content-Type': 'text/html' })
-                                            .end(html);
+                                        response.writeHead(200, { 'Content-Type': 'text/html' });
+                                        response.end(html);
                                         return [3 /*break*/, 5];
                                     case 4:
                                         error_4 = _a.sent();

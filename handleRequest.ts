@@ -13,7 +13,7 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
 
   console.log('Debugging -- url is', url, 'while method is', method);
 
-  if (url === '/apply-loan') {
+  if (url === '/apply-loan' && method === 'GET') {
 
     try {
       const htmlContent = fs.readFileSync(htmlFilePath, 'utf-8');
@@ -100,7 +100,7 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
         .end(htmlErrorContent);
     }
 
-  } else if (url === '/update-loan-status' && method === "POST") {
+  } else if (url === '/update-loan-status' && method === "PATCH") {
     let body = '';
     request.on('data', (chunk) => {
       body += chunk.toString();
@@ -127,7 +127,7 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
       }
     })
 
-  } else if (url === '/check-loan-status' && method === 'POST') {
+  } else if (url === '/check-loan-status' && method === 'GET') {
 
     try {
       const checkStatusHTML = fs.readFileSync(checkLoanStatusPath, 'utf-8')
@@ -141,7 +141,6 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
         .writeHead(500, { 'Content-Type': 'text/html' })
         .end(htmlErrorContent);
     }
-
   } else if (url === '/display-loan-status' && method === 'POST') {
 
     let body = '';
